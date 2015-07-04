@@ -19,11 +19,13 @@ libhangul은 다음 링크에서 구하실 수 있습니다.
 http://kldp.net/projects/hangul/
 
 ## 빌드와 설치 방법
- $ mkdir build
- $ cd build
- $ qmake ../
- $ make
- # sudo make install
+
+    $ mkdir build
+    $ cd build
+    $ qmake ../
+    $ make
+    # sudo make install
+
 
 ## 설정 방법
 Qt 4와 Qt 5가 공존하는 환경이라면 환경 변수 QT4_IM_MODULE 및 QT_IM_MODULE이 각각
