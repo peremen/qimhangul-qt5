@@ -1,0 +1,5 @@
+qimhangul-qt5 0.0.1
+
+ * Qt5 지원
+ * qmake 사용
+ * libhangul 0.0.12 지원
