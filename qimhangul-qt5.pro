@@ -19,11 +19,13 @@ QT += gui-private x11extras widgets
 INCLUDEPATH += .
 HEADERS += \
     main.h \
-    qimhangulplatforminputcontext.h
+    qimhangulplatforminputcontext.h \
+    candidatelist.h
 
 SOURCES += \
     main.cpp \
-    qimhangulplatforminputcontext.cpp
+    qimhangulplatforminputcontext.cpp \
+    candidatelist.cpp
 
 #OTHER_FILES += qimhangul-qt5.json
 

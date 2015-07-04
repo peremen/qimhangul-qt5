@@ -25,10 +25,13 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QTextFormat>
+#include <QWidget>
 
 #include <QDebug>
 
 #include <hangul.h>
+
+HanjaTable* QHangulPlatformInputContext::hanjaTable = NULL;
 
 static inline QString ucsToQString(const ucschar *ucs);
 
@@ -53,7 +56,33 @@ static inline QString ucsToQString(const ucschar *ucs) {
 
 QHangulPlatformInputContext::QHangulPlatformInputContext() {
     QHangulPlatformInputContext(QStringLiteral("2"));
+}
 
+QHangulPlatformInputContext::QHangulPlatformInputContext(const QString &keyboardType) {
+    int i, n;
+    n = hangul_ic_get_n_keyboards();
+
+    m_hic = NULL;
+    for(i = 0; i < n; i++) {
+        const char *s = hangul_ic_get_keyboard_id(i);
+        if (keyboardType == s) {
+            m_hic = hangul_ic_new(s);
+            break;
+        }
+    }
+
+    if (m_hic == NULL) {
+        m_hic = hangul_ic_new("2");
+    }
+    hangul_ic_connect_callback(m_hic, "transition", (void*)onTransition, NULL);
+    m_candidateList = NULL;
+    m_focusObject = NULL;
+}
+
+QHangulPlatformInputContext::~QHangulPlatformInputContext() {
+    if (m_hic != NULL) {
+        hangul_ic_delete(m_hic);
+    }
 }
 
 bool QHangulPlatformInputContext::isValid() const {
@@ -61,11 +90,9 @@ bool QHangulPlatformInputContext::isValid() const {
 }
 
 void QHangulPlatformInputContext::reset() {
-    /*
     if (m_candidateList != NULL && m_candidateList->isVisible()) {
 	m_candidateList->close();
     }
-    */
 
     const ucschar *flushed = hangul_ic_flush(m_hic);
 
@@ -130,7 +157,6 @@ bool QHangulPlatformInputContext::backspace() {
 }
 
 bool QHangulPlatformInputContext::popupCandidateList() {
-    /*
     const ucschar *text = hangul_ic_get_preedit_string(m_hic);
     if (text != NULL && *text != 0) {
 	QString str;
@@ -142,7 +168,7 @@ bool QHangulPlatformInputContext::popupCandidateList() {
 
 	QPoint p(0, 0);
 
-	QWidget *focus = focusWidget();
+	QWidget *focus = qobject_cast<QWidget *>(m_focusObject);
 	if (focus != NULL) {
 	    QVariant v = focus->inputMethodQuery(Qt::ImMicroFocus);
 	    QRect r = v.toRect();
@@ -151,45 +177,16 @@ bool QHangulPlatformInputContext::popupCandidateList() {
 
 	m_candidateList->open(list, p.x(), p.y());
     }
-    */
 
     return false;
 }
 
-
-QHangulPlatformInputContext::QHangulPlatformInputContext(const QString &keyboardType) {
-    qDebug() << "Selected keyboard type: " << keyboardType;
-
-    int i, n;
-    n = hangul_ic_get_n_keyboards();
-
-    m_hic = NULL;
-    for(i = 0; i < n; i++) {
-        const char *s = hangul_ic_get_keyboard_id(i);
-        if (keyboardType == s) {
-            m_hic = hangul_ic_new(s);
-            break;
-        }
-    }
-
-    if (m_hic == NULL) {
-        m_hic = hangul_ic_new("2");
-    }
-    hangul_ic_connect_callback(m_hic, "transition", (void*)onTransition, NULL);
-}
-
-QHangulPlatformInputContext::~QHangulPlatformInputContext() {
-    if (m_hic != NULL) {
-        hangul_ic_delete(m_hic);
-    }
-}
 
 bool QHangulPlatformInputContext::filterEvent(const QEvent *event) {
     if (event->type() != QEvent::KeyPress)
 	return false;
 
     const QKeyEvent *keyevent = static_cast<const QKeyEvent*>(event);
-    /*
     if (m_candidateList != NULL && m_candidateList->isVisible()) {
 	if (m_candidateList->filterEvent(keyevent)) {
 	    if (m_candidateList->isSelected()) {
@@ -201,7 +198,6 @@ bool QHangulPlatformInputContext::filterEvent(const QEvent *event) {
 	}
 	return true;
     }
-    */
 
     if (keyevent->key() == Qt::Key_Shift)
 	return false;
@@ -221,11 +217,9 @@ bool QHangulPlatformInputContext::filterEvent(const QEvent *event) {
 	return true;
     }
 
-    /*
     if (isCandidateKey(keyevent)) {
 	return popupCandidateList();
     }
-    */
 
     if (keyevent->modifiers() & Qt::ControlModifier ||
 	keyevent->modifiers() & Qt::AltModifier ||

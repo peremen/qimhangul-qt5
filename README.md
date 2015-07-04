@@ -46,6 +46,3 @@ hangul/hangulinputcontext.c의 HangulKeyboard 구조체의 두 번째 인자를 
 ## 사용 방법
 한영 전환키는 Shift+Space, Hangul키 입니다.
 한자 변환키는 F9, Hangul_Hanja 키 입니다.
-
-## 버그
-한자 입력을 아직까지는 지원하지 않습니다. 다음 릴리즈에 추가될 예정입니다.

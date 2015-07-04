@@ -26,6 +26,10 @@ class QHangulPlatformInputContextPlugin: public QPlatformInputContextPlugin {
     Q_OBJECT
 public:
     Q_PLUGIN_METADATA(IID QPlatformInputContextFactoryInterface_iid FILE "qimhangul-qt5.json")
-    QStringList keys() const;
+
+    QHangulPlatformInputContextPlugin();
+    ~QHangulPlatformInputContextPlugin();
+
+//    QStringList keys() const;
     QHangulPlatformInputContext *create(const QString &system, const QStringList& paramList);
 };

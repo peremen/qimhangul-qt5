@@ -20,13 +20,26 @@
 
 #include "main.h"
 
+QHangulPlatformInputContextPlugin::QHangulPlatformInputContextPlugin() {
+    if (QHangulPlatformInputContext::hanjaTable)
+	hanja_table_delete(QHangulPlatformInputContext::hanjaTable);
+    QHangulPlatformInputContext::hanjaTable = hanja_table_load(NULL);
+}
+
+QHangulPlatformInputContextPlugin::~QHangulPlatformInputContextPlugin() {
+    if (QHangulPlatformInputContext::hanjaTable)
+	hanja_table_delete(QHangulPlatformInputContext::hanjaTable);
+}
+
 // If QT_IM_MODULE contains colon, the values after colon will be passed into
 // paramList.
 // Example: QT_IM_MODULE=hangul:2 -> system=hangul, paramList=[ "2" ]
 
+/*
 QStringList QHangulPlatformInputContextPlugin::keys() const {
     return QStringList(QStringLiteral("hangul"));
 }
+*/
 
 QHangulPlatformInputContext *QHangulPlatformInputContextPlugin::create(const QString &system, const QStringList &paramList) {
     if (system.compare(system, QStringLiteral("hangul"), Qt::CaseInsensitive) == 0) {

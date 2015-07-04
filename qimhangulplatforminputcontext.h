@@ -23,8 +23,11 @@
 
 #include <qpa/qplatforminputcontext.h>
 #include <QtCore/QList>
-#include <hangul.h>
 #include <QKeyEvent>
+
+#include <hangul.h>
+
+#include "candidatelist.h"
 
 class QHangulPlatformInputContext: public QPlatformInputContext {
     Q_OBJECT
@@ -41,6 +44,8 @@ public:
     bool filterEvent(const QEvent *event);
 
     void setFocusObject(QObject *object);
+
+    static HanjaTable *hanjaTable;
 
 private:
     typedef enum {
@@ -63,6 +68,7 @@ private:
     HangulInputContext *m_hic;
     InputMode m_mode;
     QObject *m_focusObject;
+    CandidateList *m_candidateList;
 };
 
 #endif
